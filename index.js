@@ -153,15 +153,23 @@ async function run() {
     // post api for about
     app.post(
       "/api/about",
-      aboutImageUpload.single("about"),
+      aboutImageUpload.array("aboutfiles"),
       async (req, res) => {
+        console.log(req.files);
+        const aboutUploadedFiles = req.files;
+        const array = aboutUploadedFiles.map((file, index) => ({
+          id: index + 1,
+          pathname: file.filename,
+        }));
+        const description = req.body.description;
+
         try {
-          const AboutData = {
-            image: req.file.filename,
-            description: req.body.description,
+          const aboutData = {
+            description: description,
+            imageArr: array,
           };
 
-          const result = await aboutCollection.insertOne(AboutData);
+          const result = await aboutCollection.insertOne(aboutData);
           res.send(result);
         } catch (error) {
           console.error(error);
