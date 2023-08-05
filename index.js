@@ -69,7 +69,7 @@ const upload = multer({ storage });
 const teamImageUpload = multer({ storage: teamImageStorage });
 const aboutImageUpload = multer({ storage: AboutImageStorage });
 const monksGalaryImageUpload = multer({ storage: monksGalaryImageStorage });
-const timeLineImageUpload =multer({storage:timelineImageStorage})
+const timeLineImageUpload = multer({ storage: timelineImageStorage });
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -108,12 +108,17 @@ async function run() {
       res.send(result);
     });
     // post for the cover home
-    app.post("/upload", upload.single("file"), async (req, res) => {
-      console.log(req.file);
-      const cover = req.file.filename;
-      console.log(cover);
+    app.post("/upload", upload.array("files"), async (req, res) => {
+      const uploadedFiles = req.files;
+      const filesArray = uploadedFiles.map((file, index) => ({
+        id: index + 1,
+        pathname: file.filename,
+      }));
+
+      console.log(filesArray);
+
       // Process the file as needed
-      const result = await homeCollection.insertOne({ path: cover });
+      const result = await homeCollection.insertOne({ path: filesArray });
       console.log(result);
       res.send(result);
     });
@@ -232,16 +237,16 @@ async function run() {
       }
     );
 
-        // delete api for monks galary
-        app.delete("/api/monks-galary/:id", async (req, res) => {
-          console.log("delete is called");
-          const id = req.params.id;
-          console.log(id);
-          const query = { _id: new ObjectId(id) };
-          const result = await galaryCollection.deleteOne(query);
-          res.send(result);
-        });
-    
+    // delete api for monks galary
+    app.delete("/api/monks-galary/:id", async (req, res) => {
+      console.log("delete is called");
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: new ObjectId(id) };
+      const result = await galaryCollection.deleteOne(query);
+      res.send(result);
+    });
+
     /*..........................................
       ..................Teams Data.........................
         ................................................*/
@@ -419,7 +424,6 @@ async function run() {
         }
       }
     );
-
 
     //delete api for worktimeline link
     app.delete("/api/work-timeline/:id", async (req, res) => {
