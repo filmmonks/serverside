@@ -337,8 +337,8 @@ async function run() {
 
     // post all the showreels link
     app.post("/api/showreels-link", async (req, res) => {
-      const teamMember = req.body;
-      const result = await showreelCollection.insertOne(teamMember);
+      const showreel = req.body;
+      const result = await showreelCollection.insertOne(showreel);
       res.send(result);
     });
 
